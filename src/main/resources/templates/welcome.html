@@ -10,7 +10,25 @@
       <img class="img-responsive" src="../static/resources/images/pets.png" th:src="@{/resources/images/pets.png}" />
     </div>
   </div>
+  <table id="owners" class="table table-striped">
+    <thead>
+    <tr>
+      <th th:text="#{name}">Name, Last Name</th>
+      <th>Adress</th>
+      <th th:text="#{city}">City</th>
+      <th th:text="#{telephone}">Telephone</th>
 
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="owner : ${owners}">
+      <td th:text="${owner.firstName + ' ' + owner.lastName}"></td>
+      <td th:text="${owner.address}"></td>
+      <td th:text="${owner.city}"></td>
+      <td th:text="${owner.telephone}"></td>
+    </tr>
+    </tbody>
+  </table>
 </body>
 
 </html>

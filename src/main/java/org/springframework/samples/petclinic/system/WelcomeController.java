@@ -16,14 +16,22 @@
 
 package org.springframework.samples.petclinic.system;
 
+import org.springframework.ui.Model;
+import org.springframework.samples.petclinic.owner.OwnerRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 class WelcomeController {
 
+	private final OwnerRepository ownerRepository;
+
+	public WelcomeController(OwnerRepository ownerRepository) {
+		this.ownerRepository = ownerRepository;
+	}
 	@GetMapping("/")
-	public String welcome() {
+	public String welcome(Model model) {
+		model.addAttribute("owners", ownerRepository.findAll());
 		return "welcome";
 	}
 
