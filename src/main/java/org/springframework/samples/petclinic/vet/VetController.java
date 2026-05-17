@@ -17,14 +17,16 @@ package org.springframework.samples.petclinic.vet;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.samples.petclinic.owner.Owner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * @author Juergen Hoeller
@@ -39,6 +41,33 @@ class VetController {
 
 	public VetController(VetRepository vetRepository) {
 		this.vetRepository = vetRepository;
+	}
+
+	private static final String VIEWS_VET_CREATE_FORM = "vets/createVetForm";
+
+	@GetMapping("/vets/new")
+	public String initCreationForm() {
+		return VIEWS_VET_CREATE_FORM;
+	}
+
+	@PostMapping("/vets/new")
+	public String processCreationForm(@Valid Vet vet, BindingResult result, RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("error", "There was an error in creating the vet.");
+			return VIEWS_VET_CREATE_FORM;
+		}
+
+		this.vetRepository.save(vet);
+		redirectAttributes.addFlashAttribute("message", "New Vet Created");
+		return "redirect:/vets.html";
+	}
+
+	@ModelAttribute("vet")
+	public Vet findVet(@PathVariable(name = "vetId", required = false) Integer vetId) {
+		return vetId == null ? new Vet()
+			: this.vetRepository.findById(vetId)
+			.orElseThrow(() -> new IllegalArgumentException("Vet not found with id: " + vetId
+				+ ". Please ensure the ID is correct " + "and the owner exists in the database."));
 	}
 
 	@GetMapping("/vets.html")
